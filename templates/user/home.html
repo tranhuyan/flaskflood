@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %} Home Page {% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/knob.css') }}">
+<header>
+    {% include 'components/menu.html' %}
+</header>
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-xl-7">
+            {% include 'components/map.html' %}
+        </div>
+        <div class="col-xl-5">
+            {% include 'components/knob.html' %}
+        </div>
+    </div>
+</div>
+    {% endblock %}

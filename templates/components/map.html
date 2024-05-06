@@ -1,0 +1,92 @@
+<div class="map" id="map">
+    <div class="warning-box">
+        <div class="text-1">
+            Bảng cảnh báo ngập lụt
+        </div>
+        <div class="box-text">
+            <div class="box-text-1">
+                <div class="box-color-1"></div>
+                <div class="an-toan">Vùng an toàn: trên <span id="safe_zone"></span> cm</div>
+            </div>
+            <div class="box-text-2">
+                <div class="box-color-2"></div>
+                <div class="nguy-co">Vùng có nguy cơ: từ <span id="warning_zone1"></span> đến <span
+                        id="warning_zone2"></span> cm</div>
+            </div>
+            <div class="box-text-3">
+                <div class="box-color-3"></div>
+                <div class="nguy-hiem">Vùng nguy hiểm: Nhỏ hơn <span id="danger_zone"></span> cm</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    const firebaseConfig = {
+        apiKey: "AIzaSyDilFwuGpGZGOaYZYcDA0Qw3CUZbYD560s",
+        authDomain: "du-bao-lu-b9c73.firebaseapp.com",
+        databaseURL: "https://du-bao-lu-b9c73-default-rtdb.firebaseio.com",
+        projectId: "du-bao-lu-b9c73",
+        storageBucket: "du-bao-lu-b9c73.appspot.com",
+        messagingSenderId: "641972361354",
+        appId: "1:641972361354:web:ef4931ebf9c821946c3573",
+        measurementId: "G-FC7B5L3Z2L"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const map = L.map('map').setView([10.824783528324401, 106.6278295821722], 8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    const location1 = L.marker([10.824783528324401, 106.6278295821722]).addTo(map);
+    const circle1 = L.circle([10.824783528324401, 106.6278295821722], {
+        color: 'blue',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: 10000
+    }).addTo(map);
+
+    const circleColor = (water_level, danger_zone, warning_zone) => {
+        let color;
+        if (water_level <= danger_zone) {
+            color = 'red';
+        } else if (water_level <= warning_zone) {
+            color = 'orange';
+        } else {
+            color = 'green';
+        }
+        return color;
+    };
+    const realtime_child = database.ref("/data");
+    realtime_child.on('value', function (snapshot) {
+        const data = snapshot.val();
+        const water_level = data.water_level;
+        const caution_level = parseInt(data.caution_level);
+        const warning_zone = caution_level + 20;
+        const danger_zone = caution_level;
+
+        const content = '<div class="sensor-info">' +
+            '<b>Khu vực cầu Tham Lương</b><br>' +
+            '<b><i class="fas fa-ruler"></i>Water depth:</b> <span class="distance">' + water_level + ' cm</span><br>' +
+            '<b><i class="fas fa-thermometer-half"></i>Temperature:</b> <span class="temperature">' + data.temp + ' °C</span><br>' +
+            '<b><i class="fas fa-tint"></i>Humidity:</b> <span class="humidity">' + data.humi + ' %</span>;<br>' +
+            '</div>';
+
+        location1.bindPopup(content);
+
+        const color = circleColor(water_level, danger_zone, warning_zone);
+
+        circle1.setStyle({
+            color: color,
+            fillColor: color
+        });
+
+        document.getElementById('safe_zone').innerText = warning_zone;
+        document.getElementById('warning_zone1').innerText = danger_zone;
+        document.getElementById('warning_zone2').innerText = warning_zone;
+        document.getElementById('danger_zone').innerText = danger_zone;
+    });
+</script>

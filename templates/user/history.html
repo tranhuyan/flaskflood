@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %} History Page {% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+<header>
+    {% include 'components/menu.html' %}
+</header>
+
+<div class="container">
+    <div class="datepicker-container">
+        <input type="text" id="from_date" placeholder="Từ ngày" class="datepicker-input">
+        <input type="text" id="to_date" placeholder="Đến ngày" class="datepicker-input">
+        <button id="filter_btn"><i class="far fa-paper-plane"></i></button>
+        <button id="export-excel">Xuất Excel</button>
+    </div>
+    <div class="table-history">
+        <table id="history_table_id" class="centered" style="overflow: hidden;">
+            <thead>
+                <tr>
+                    <th>Ngày</th>
+                    <th>Thời gian</th>
+                    <th>Độ ẩm (%)</th>
+                    <th>Nhiệt độ (°C)</th>
+                    <th>Mực nước (cm)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(".datepicker-input").datepicker({
+            dateFormat: "dd-mm-yy"
+        });
+
+        $("#filter_btn").click(function () {
+            const from_date = $("#from_date").val();
+            const to_date = $("#to_date").val();
+
+            $.ajax({
+                url: "/get_history",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ start_date: from_date, end_date: to_date }),
+                success: function (data) {
+                    data.sort(function (a, b) {
+                        return new Date(a.date.split("-").reverse().join("-")) - new Date(b.date.split("-").reverse().join("-"));
+                    });
+
+                    if ($.fn.DataTable.isDataTable('#history_table_id')) {
+                        $('#history_table_id').DataTable().destroy();
+                    }
+
+                    $("#history_table_id tbody").empty();
+
+                    data.forEach(function (item) {
+                        $("#history_table_id tbody").append(
+                            `<tr>
+                                <td>${item.date}</td>
+                                <td>${item.time}</td>
+                                <td>${item.humi}</td>
+                                <td>${item.temp}</td>
+                                <td>${item.water_level}</td>
+                            </tr>`
+                        );
+                    });
+
+                    $('#history_table_id').DataTable({
+                        "order": [],
+                        "columnDefs": [
+                            { "type": "date-eu", targets: 0 },
+                            { "type": "num", targets: 4 }
+                        ]
+                    });
+                },
+                error: function () {
+                    alert("Đã xảy ra lỗi khi lấy dữ liệu lịch sử.");
+                }
+            });
+        });
+
+        $("#export-excel").click(function () {
+            const table = $('#history_table_id').DataTable();
+            const rows = table.rows().data().toArray();
+            const data = rows.map(row => [row[0], row[1], row[2], row[3], row[4]])
+
+            const ws = XLSX.utils.aoa_to_sheet([['Ngày', 'Thời gian', 'Độ ẩm (%)', 'Nhiệt độ (°C)', 'Mực nước (cm)'], ...data]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'History Data');
+            XLSX.writeFile(wb, 'history_data.xlsx');
+        });
+    });
+</script>
+
+{% endblock %}

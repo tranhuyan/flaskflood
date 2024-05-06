@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %} Charts Page {% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/charts.css') }}">
+
+<header>
+    {% include 'components/menu.html' %}
+</header>
+<div class="container">
+    <div class="datepicker-container">
+        <input type="text" id="get_chart" placeholder="Chọn ngày hiển thị chart" class="datepicker-input">
+        <button id="downloadChartBtn">Download Chart</button>
+    </div>
+    <div class="chart">
+        <canvas id="myChart"></canvas>
+    </div>
+</div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+
+    const config = {
+        apiKey: "AIzaSyDilFwuGpGZGOaYZYcDA0Qw3CUZbYD560s",
+        authDomain: "du-bao-lu-b9c73.firebaseapp.com",
+        databaseURL: "https://du-bao-lu-b9c73-default-rtdb.firebaseio.com",
+        projectId: "du-bao-lu-b9c73",
+        storageBucket: "du-bao-lu-b9c73.appspot.com",
+        messagingSenderId: "641972361354",
+        appId: "1:641972361354:web:ef4931ebf9c821946c3573",
+        measurementId: "G-FC7B5L3Z2L"
+    };
+    firebase.initializeApp(config);
+    const database = firebase.database();
+
+    $("#get_chart").datepicker({
+        dateFormat: "dd-mm-yy",
+        onSelect: function (dateText, instance) {
+            console.log("Selected date:", dateText);
+            var history_child = database.ref("/history/" + dateText);
+
+            history_child.once('value', function (snapshot) {
+                const data = snapshot.val();
+
+                if (data) {
+                    const sortedKeys = Object.keys(data).sort();
+                    const x_values_time_series = [];
+                    const y_values_humidity = [];
+                    const y_values_temperature = [];
+                    const y_values_water_level = [];
+
+                    sortedKeys.forEach(key => {
+                        const sortedKeys1 = Object.keys(data[key]).sort();
+                        sortedKeys1.forEach(key1 => {
+                            const sortedKeys2 = Object.keys(data[key][key1]).sort();
+                            sortedKeys2.forEach(key2 => {
+                                const _time = key + ":" + key1;
+                                x_values_time_series.push(_time);
+                                y_values_humidity.push(data[key][key1][key2].humi);
+                                y_values_temperature.push(data[key][key1][key2].temp);
+                                y_values_water_level.push(data[key][key1][key2].water_level);
+                            });
+                        });
+                    });
+
+                    main_chart.data.labels = x_values_time_series;
+                    main_chart.data.datasets[0].data = y_values_humidity;
+                    main_chart.data.datasets[1].data = y_values_temperature;
+                    main_chart.data.datasets[2].data = y_values_water_level;
+
+                    main_chart.options.title.text = 'Biểu đồ dữ liệu ngày ' + dateText;
+                    main_chart.update();
+                } else {
+                    main_chart.data.labels = [];
+                    main_chart.data.datasets.forEach(dataset => {
+                        dataset.data = [];
+                    });
+                    main_chart.options.title.text = 'Biểu đồ dữ liệu ngày ' + dateText;
+                    main_chart.update();
+                }
+            });
+        }
+    });
+
+    var main_chart;
+
+    main_chart = new Chart("myChart", {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [{
+                label: "Độ ẩm",
+                data: [],
+                backgroundColor: 'rgba(100, 149, 237, 0.2)',
+                borderColor: 'rgba(100, 149, 237, 1)',
+                borderWidth: 1,
+                lineTension: 0.4
+            }, {
+                label: "Nhiệt độ",
+                data: [],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1,
+                lineTension: 0.4
+            }, {
+                label: "Mực nước",
+                data: [],
+                backgroundColor: 'rgba(100, 255, 132, 0.2)',
+                borderColor: 'rgba(100, 255, 132, 1)',
+                borderWidth: 1,
+                lineTension: 0.4
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Biểu đồ dữ liệu ngày '
+            }
+        }
+    });
+
+    document.getElementById("downloadChartBtn").addEventListener("click", function () {
+        var canvas = document.getElementById("myChart");
+        var url = canvas.toDataURL("image/png");
+        var selectedDate = document.getElementById("get_chart").value;
+        var fileName = 'chart_' + selectedDate + '.png';
+
+        var link = document.createElement('a');
+        link.download = fileName;
+        link.href = url;
+        link.click();
+    });
+</script>
+{% endblock %}

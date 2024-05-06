@@ -1,0 +1,178 @@
+.table-history {
+  width: 70%;
+  margin: auto;
+  background: white;
+  padding: 20px;
+}
+.datepicker-container {
+  text-align: left;
+  margin-bottom: 20px;
+  width: 70%;
+  max-width: 1100px;
+  margin: auto;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.datepicker-input {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  margin-right: 10px;
+  text-align: center;
+  width: 130px;
+}
+#filter_btn {
+  color: white;
+  background: rgb(78, 78, 231);
+  padding: 4px 10px 4px 10px;
+  border-radius: 5px;
+}
+#export-excel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: white;
+  background: rgb(23, 99, 37);
+  padding: 4px 10px 4px 10px;
+  border-radius: 5px;
+}
+#history_table_id {
+  width: 100%;
+  margin: auto;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+}
+
+#history_table_id th,
+#history_table_id td {
+  padding: 8px;
+  text-align: left;
+}
+
+#history_table_id th {
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+#history_table_id tbody {
+  border-top: 2px solid #ddd;
+}
+
+@media screen and (max-width: 991px) {
+  .table-history {
+    width: 100%;
+    margin: auto;
+    background: white;
+    padding: 5px;
+  }
+  .datepicker-container {
+    text-align: left;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 1100px;
+    margin: auto;
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .datepicker-input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    margin-right: 10px;
+    text-align: center;
+    width: 130px;
+  }
+  .filter_btn {
+    position: absolute; /* Thêm dòng này */
+    top: 0;
+    right: 0; /* Thêm dòng này */
+  }
+  #history_table_id {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+  }
+
+  #history_table_id th,
+  #history_table_id td {
+    padding: 8px;
+    text-align: left;
+  }
+
+  #history_table_id th {
+    background-color: #f2f2f2;
+    color: #333;
+  }
+
+  #history_table_id tbody {
+    border-top: 2px solid #ddd;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .container {
+    margin: 0;
+    padding: 0;
+  }
+
+  .table-history {
+    width: 100%;
+    margin: auto;
+    background: white;
+    padding: 20px;
+  }
+  .datepicker-container {
+    text-align: left;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 1100px;
+    margin: auto;
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .datepicker-input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    margin-right: 10px;
+    text-align: center;
+    width: 130px;
+  }
+  #export-excel {
+    position: relative;
+    display: block;
+    color: white;
+    margin-top: 5px;
+    background: rgb(23, 99, 37);
+    padding: 4px 10px 4px 10px;
+    border-radius: 5px;
+  }
+  #history_table_id {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+  }
+
+  #history_table_id th,
+  #history_table_id td {
+    padding: 8px;
+    text-align: left;
+  }
+
+  #history_table_id th {
+    background-color: #f2f2f2;
+    color: #333;
+  }
+
+  #history_table_id tbody {
+    border-top: 2px solid #ddd;
+  }
+}
